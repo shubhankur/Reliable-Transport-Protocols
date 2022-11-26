@@ -5,11 +5,10 @@
 #include "stdlib.h"
 #define NULL 0
 
-
 /* ******************************************************************
  ALTERNATING BIT AND GO-BACK-N NETWORK EMULATOR: VERSION 1.1  J.F.Kurose
 
-   This code should be used for PA2, unidirectional data transfer 
+   This code should be used for PA2, unidirectional data transfer
    protocols (from A to B). Network properties:
    - one way network delay averages five time units (longer if there
      are other messages in the channel for GBN), but can be larger
@@ -20,8 +19,9 @@
 **********************************************************************/
 
 /********* STUDENTS WRITE THE NEXT SIX ROUTINES *********/
-//We create a buffer to store all the msgs
-struct buffer{
+// We create a buffer to store all the msgs
+struct buffer
+{
   struct msg message;
   struct buffer *next;
 };
@@ -35,47 +35,55 @@ struct buffer *head = NULL;
 struct buffer *tail = NULL;
 
 /* called from layer 5, passed the data to be sent to other side */
-void A_output(message)
-  struct msg message;
+void A_output(message) struct msg message;
 {
   printf("starting\n");
-  //Creating new buffer using message
-  struct buffer *new = malloc(sizeof(struct buffer)); 
-  if(new == NULL) {
+  // Creating new buffer using message
+  struct buffer *new = malloc(sizeof(struct buffer));
+  if (new == NULL)
+  {
     printf("no enough memory\n");
-    return;
   }
-  printf("created buffer\n");
-  struct msg *m = &message;
-  for(int i = 0; i < 20; ++i) {
-    new->message.data[i] = m->data[i];
+  else
+  {
+    printf("created buffer\n");
+    new->next = NULL;
+    struct msg *m = &message;
+    for (int i = 0; i < 20; ++i)
+    {
+      new->message.data[i] = m->data[i];
+    }
+    printf("msg copied\n");
+    printf(new->message.data);
+    // Adding new buffer in the existing buffer
+    if (tail == NULL)
+    {
+      tail = new;
+      head = new;
+    }
+    else
+    {
+      tail->next = new;
+      tail = new;
+    }
   }
-  printf(new->message.data);
-
-  //Adding new buffer in the existing buffer
-  if(tail==NULL){
-    tail = new;
-    head = new;
-  }
-  else{
-    tail->next = new;
-    tail = new;
-  }
-  new->next = NULL;
   free(new);
 
-  //Retreive the first message in the buffer
+  // Retreive the first message in the buffer
   struct buffer *curr_buffer = head;
-  if(curr_buffer==NULL){
+  if (curr_buffer == NULL)
+  {
     printf("No msg to process");
     return;
   }
-  head = head -> next;
-  if(head==NULL){
+  head = head->next;
+  if (head == NULL)
+  {
     tail == NULL;
   }
 
-  if(!sender_state) return;
+  if (!sender_state)
+    return;
 
   strncpy(curr_packet.payload, head->message.data, 20);
   printf(curr_packet.payload);
@@ -87,70 +95,73 @@ void A_output(message)
   starttimer(0, 10.0);
 }
 
-int get_checksum(struct pkt *pkt){
-    int result = 0;
-    if(pkt == NULL){
-        return result;
-    }
-    result = result + pkt->acknum;
-    result = result + pkt->seqnum;
-    int i = 0;
-    while(i<20){
-      result = result + (unsigned char)pkt->payload[i++];
-    }
+int get_checksum(struct pkt *pkt)
+{
+  int result = 0;
+  if (pkt == NULL)
+  {
     return result;
+  }
+  result = result + pkt->acknum;
+  result = result + pkt->seqnum;
+  int i = 0;
+  while (i < 20)
+  {
+    result = result + (unsigned char)pkt->payload[i++];
+  }
+  return result;
 }
 
 /* called from layer 3, when a packet arrives for layer 4 */
-void A_input(packet)
-  struct pkt packet;
+void A_input(packet) struct pkt packet;
 {
-  if(packet.checksum!=get_checksum(&packet)){
+  if (packet.checksum != get_checksum(&packet))
+  {
     return;
   }
-  if(packet.acknum!=seq_num_A){
+  if (packet.acknum != seq_num_A)
+  {
     return;
   }
-  seq_num_A=1-seq_num_A;
+  seq_num_A = 1 - seq_num_A;
   sender_state = true;
-  //stoptimer(0);
+  // stoptimer(0);
 }
 
 /* called when A's timer goes off */
 void A_timerinterrupt()
 {
-  if(sender_state==true){
+  if (sender_state == true)
+  {
     tolayer3(0, curr_packet);
     starttimer(0, 10.0);
   }
-}  
+}
 
 /* the following routine will be called once (only) before any other */
 /* entity A routines are called. You can use it to do any initialization */
 void A_init()
 {
-
 }
 
 /* Note that with simplex transfer from a-to-B, there is no B_output() */
 
 /* called from layer 3, when a packet arrives for layer 4 at B*/
-void B_input(packet)
-  struct pkt packet;
+void B_input(packet) struct pkt packet;
 {
-  if(packet.checksum != get_checksum(&packet))
+  if (packet.checksum != get_checksum(&packet))
   {
     return;
   }
 
-  if(packet.seqnum != seq_num_B)
+  if (packet.seqnum != seq_num_B)
   {
     return;
   }
   /* normal package, deliver data to layer5 */
   else
   {
-    seq_num_B = 1- seq_num_B;
+    seq_num_B = 1 - seq_num_B;
     tolayer5(1, packet.payload);
   }
 
@@ -164,5 +175,4 @@ void B_input(packet)
 /* entity B routines are called. You can use it to do any initialization */
 void B_init()
 {
-
 }
