@@ -84,7 +84,7 @@ void A_output(message) struct msg message;
   curr_packet.acknum = 1;
   curr_packet.seqnum = seq_num_A;
   curr_packet.checksum = get_checksum(&curr_packet);
-  starttimer(0, 10.0);
+  starttimer(0, 20.0);
   tolayer3(0, curr_packet);
   sender_state = false;
 
