@@ -43,7 +43,6 @@ void A_output(message) struct msg message;
   {
     new->message.data[i] = '\0';
   }
-  printf(new->message.data);
   if (new == NULL)
   {
     printf("no enough memory\n");
@@ -51,12 +50,8 @@ void A_output(message) struct msg message;
   else
   {
     new->next = NULL;
-    for (int i = 0; i < sizeof(new->message.data) / sizeof(new->message.data[0]); i++)
-    {
-      new->message.data[i] = message.data[i];
-    }
+    strncpy(new->message.data, message.data, sizeof(message.data)/sizeof(message.data[0]));
     new->message.data[20]='\0';
-    // strncpy(new->message.data, message.data, sizeof(message.data)/sizeof(message.data[0]));
     //  Adding new buffer in the existing buffer
     if (tail == NULL)
     {
@@ -70,8 +65,7 @@ void A_output(message) struct msg message;
       tail = new;
     }
   }
-  printf(new->message.data);
-  printf("\n");
+
   // Retreive the first message in the buffer
   struct buffer *curr_buffer = head;
   printf(curr_buffer->message.data);
@@ -126,15 +120,17 @@ void A_input(packet) struct pkt packet;
 {
   if (packet.checksum != get_checksum(&packet))
   {
+    printf("Wrong checksum at A\n");
     return;
   }
   if (packet.acknum != seq_num_A)
   {
+    printf("Incorrect seq no at A\n");
     return;
   }
   seq_num_A = 1 - seq_num_A;
   sender_state = true;
-  printf("Received");
+  printf("Received ACK %d at A\n", packet.acknum);
   stoptimer(0);
 }
 
@@ -161,17 +157,20 @@ void B_input(packet) struct pkt packet;
 {
   if (packet.checksum != get_checksum(&packet))
   {
+    printf("Wrong checksum at B\n");
     return;
   }
 
   if (packet.seqnum != seq_num_B)
   {
+    printf("Incorrect seq number at B\n");
     return;
   }
   /* normal package, deliver data to layer5 */
   else
   {
     seq_num_B = 1 - seq_num_B;
+    printf(packet.payload);
     tolayer5(1, packet.payload);
   }
 
