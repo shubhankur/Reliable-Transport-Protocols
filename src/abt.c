@@ -101,7 +101,7 @@ void A_input(packet)
     return;
   }
   A_seqnum = (A_seqnum + 1) % 2;
-  //stoptimer(A);
+  stoptimer(A);
   sender_state = waiting_pkt;
 
 }
