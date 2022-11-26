@@ -51,6 +51,7 @@ void A_output(message) struct msg message;
     strncpy(new->message.data, message.data, 20);
     printf("msg copied\n");
     printf(new->message.data);
+    printf("\n");
     // Adding new buffer in the existing buffer
     if (tail == NULL)
     {
@@ -82,6 +83,8 @@ void A_output(message) struct msg message;
     return;
 
   printf("creating packet \n");
+  printf(head->message.data);
+  printf("\n");
   strncpy(curr_packet.payload, head->message.data, 20);
   printf(curr_packet.payload);
   curr_packet.acknum = 1;
