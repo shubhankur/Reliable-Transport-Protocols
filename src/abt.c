@@ -25,6 +25,7 @@ bool sender_state = true;
 struct pkt packet;
 int seq_num_A = 0;
 int seq_num_B = 0;
+int get_checksum(struct pkt *packet);
 
 /* called from layer 5, passed the data to be sent to other side */
 void A_output(message)
