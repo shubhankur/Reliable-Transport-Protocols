@@ -49,10 +49,9 @@ int get_checksum(struct pkt *pkt){
     }
     result = result + pkt->acknum;
     result = result + pkt->seqnum;
-    char payload[20] = pkt->payload;
     int i = 0;
     while(i<20){
-      result = result + (unsigned char)payload[i];
+      result = result + (unsigned char)pkt->payload[i++];
     }
     return result;
 }
