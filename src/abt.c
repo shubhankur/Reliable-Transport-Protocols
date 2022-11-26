@@ -1,5 +1,6 @@
 #include "../include/simulator.h"
 #include "stdbool.h"
+#include "string.h"
 
 /* ******************************************************************
  ALTERNATING BIT AND GO-BACK-N NETWORK EMULATOR: VERSION 1.1  J.F.Kurose
@@ -22,7 +23,7 @@ struct buffer{
 };
 
 bool sender_state = true;
-struct pkt packet;
+struct pkt curr_packet;
 int seq_num_A = 0;
 int seq_num_B = 0;
 int get_checksum(struct pkt *packet);
@@ -33,22 +34,22 @@ void A_output(message)
 {
   if(!sender_state) return;
   sender_state = false;
-  strncpy(message.data, packet.payload, 20);
-  packet.acknum = 1;
-  packet.seqnum = seq_num_A;
-  packet.checksum = get_checksum(&packet);
-  tolayer3(0, packet);
+  strncpy(curr_packet.payload, message.data, 20);
+  curr_packet.acknum = 1;
+  curr_packet.seqnum = seq_num_A;
+  curr_packet.checksum = get_checksum(&curr_packet);
+  tolayer3(0, curr_packet);
   starttimer(0, 10.0);
 }
 
-int get_checksum(struct pkt *packet){
+int get_checksum(struct pkt *pkt){
     int result = 0;
-    if(packet == 0){
+    if(pkt == 0){
         return result;
     }
-    result = result + packet->acknum;
-    result = result + packet->seqnum;
-    char payload[20] = packet->payload;
+    result = result + pkt->acknum;
+    result = result + pkt->seqnum;
+    char payload[20] = pkt->payload;
     int i = 0;
     while(i<20){
       result = result + (unsigned char)payload[i];
@@ -75,7 +76,7 @@ void A_input(packet)
 void A_timerinterrupt()
 {
   if(sender_state==true){
-    tolayer3(0, packet);
+    tolayer3(0, curr_packet);
     starttimer(0, 10.0);
   }
 }  
@@ -111,7 +112,7 @@ void B_input(packet)
 
   /* send back ack */
   packet.acknum = packet.seqnum;
-  packet.checksum = calc_checksum(&packet);
+  packet.checksum = get_checksum(&packet);
 
   tolayer3(1, packet);
 }
