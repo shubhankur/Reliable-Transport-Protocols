@@ -48,11 +48,7 @@ void A_output(message) struct msg message;
   {
     printf("created buffer\n");
     new->next = NULL;
-    struct msg *m = &message;
-    for (int i = 0; i < 20; ++i)
-    {
-      new->message.data[i] = m->data[i];
-    }
+    strncpy(new->message.data, message.data, 20);
     printf("msg copied\n");
     printf(new->message.data);
     // Adding new buffer in the existing buffer
@@ -85,6 +81,7 @@ void A_output(message) struct msg message;
   if (!sender_state)
     return;
 
+  printf("creating packet \n");
   strncpy(curr_packet.payload, head->message.data, 20);
   printf(curr_packet.payload);
   curr_packet.acknum = 1;
