@@ -80,13 +80,13 @@ void A_output(message) struct msg message;
     printf("sender not ready\n");
     return;
   }
+  sender_state = false;
   strncpy(curr_packet.payload, curr_buffer->message.data, 20);
   curr_packet.acknum = 1;
   curr_packet.seqnum = seq_num_A;
   curr_packet.checksum = get_checksum(&curr_packet);
   starttimer(0, 20.0);
   tolayer3(0, curr_packet);
-  sender_state = false;
 
   // Setting head to next message
   head = head->next;
@@ -137,14 +137,14 @@ void A_input(packet) struct pkt packet;
 /* called when A's timer goes off */
 void A_timerinterrupt()
 {
-  if (sender_state == true)
+  if (!sender_state)
   {
     printf("Timer interrupt \n");
     tolayer3(0, curr_packet);
     starttimer(0, 20.0);
   }
   else{
-    printf("Timer sender state false \n");
+    printf("Timer sender state true \n");
   }
 }
 
