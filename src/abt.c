@@ -37,9 +37,11 @@ struct buffer *tail = NULL;
 void A_output(message) struct msg message;
 {
   // Creating new buffer using message
-  printf(message.data);
-  printf("\n");
-  struct buffer *new = malloc(sizeof(struct buffer));
+  printf("%s \n",message.data);
+  struct buffer *new = (struct buffer *)malloc(sizeof(struct buffer));
+  for(int i = 0;i<sizeof(new->message.data)/sizeof(new->message.data[0]);i++){
+      new->message.data[i]='\0';
+  }
   if (new == NULL)
   {
     printf("no enough memory\n");
@@ -47,11 +49,7 @@ void A_output(message) struct msg message;
   else
   {
     new->next = NULL;
-    for (int i = 0; i < 20; ++i)
-    {
-      new->message.data[i] = message.data[i];
-    }
-    //strncpy(new->message.data, message.data, 20);
+    strncpy(new->message.data, message.data, sizeof(message.data)/sizeof(message.data[0]));
     // Adding new buffer in the existing buffer
     if (tail == NULL)
     {
