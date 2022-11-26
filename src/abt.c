@@ -53,7 +53,7 @@ void A_output(message)
 { 
   int checksum = 0;
   struct node *n;
-
+  printf("%s \n", message);
   append_msg(&message);//add msg to buffer
   if(sender_state != waiting_pkt)
   {
@@ -76,6 +76,7 @@ void A_output(message)
     cur_packet.payload[i] = n->message.data[i];
   }
   free(n);
+  printf("%s \n", cur_packet.payload);
   cur_packet.seqnum = A_seqnum;
   cur_packet.acknum = DEFAULT_ACK;
   checksum = calc_checksum(&cur_packet);
@@ -140,6 +141,7 @@ void B_input(packet)
   else
   {
     B_seqnum = (B_seqnum + 1)%2;
+    printf("%s \n", packet.payload);
     tolayer5(B, packet.payload);
     //Debug_Log(B, "Send packet to layer5", &packet, NULL);
   }
