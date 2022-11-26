@@ -38,6 +38,7 @@ struct buffer *tail = NULL;
 void A_output(message) struct msg message;
 {
   // Creating new buffer using message
+  printf(message.data);
   struct buffer *new = malloc(sizeof(struct buffer));
   if (new == NULL)
   {
@@ -62,6 +63,7 @@ void A_output(message) struct msg message;
   }
   // Retreive the first message in the buffer
   struct buffer *curr_buffer = head;
+  printf(curr_buffer->message.data);
   if (curr_buffer == NULL)
   {
     printf("No msg to process");
@@ -72,9 +74,10 @@ void A_output(message) struct msg message;
   {
     tail == NULL;
   }
-
-  if (!sender_state)
+  if (!sender_state){
+    printf("sender not ready\n");
     return;
+  }
   strncpy(curr_packet.payload, curr_buffer->message.data, 20);
   curr_packet.acknum = 1;
   curr_packet.seqnum = seq_num_A;
@@ -114,7 +117,8 @@ void A_input(packet) struct pkt packet;
   }
   seq_num_A = 1 - seq_num_A;
   sender_state = true;
-  // stoptimer(0);
+  printf("Received");
+  stoptimer(0);
 }
 
 /* called when A's timer goes off */
