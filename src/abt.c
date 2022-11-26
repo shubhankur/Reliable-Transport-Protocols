@@ -45,7 +45,9 @@ void A_output(message)
     printf("no enough memory\n");
     return;
   }
-  strncpy(new->message.data, message.data, 20);
+  for(int i = 0; i < 20; ++i) {
+    new->message.data[i] = message.data[i];
+  }
   printf(new->message.data);
 
   //Adding new buffer in the existing buffer
