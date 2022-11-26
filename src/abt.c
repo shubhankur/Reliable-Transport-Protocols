@@ -27,41 +27,21 @@ bool sender_state = true;
 struct pkt curr_packet;
 int seq_num_A = 0;
 int seq_num_B = 0;
-
 int get_checksum(struct pkt *packet);
-void add_to_buffer(struct msg *m);
-
-struct buffer *head = 0;
-struct buffer *tail = 0;
+struct buffer *head = NULL;
+struct buffer *tail = NULL;
 
 /* called from layer 5, passed the data to be sent to other side */
 void A_output(message)
   struct msg message;
 {
-  add_to_buffer(&message);
-  struct buffer *curr_buffer = head;
-  head = head -> next;
-  if(head==0){
-    tail == 0;
-  }
-  if(!sender_state) return;
-  sender_state = false;
-  strncpy(curr_packet.payload, head->message.data, 20);
-  printf(curr_packet.payload);
-  curr_packet.acknum = 1;
-  curr_packet.seqnum = seq_num_A;
-  curr_packet.checksum = get_checksum(&curr_packet);
-  tolayer3(0, curr_packet);
-  starttimer(0, 10.0);
-}
-
-void add_to_buffer(struct msg *m){
   //Creating new buffer using message
   struct buffer *new = malloc(sizeof(struct buffer)); 
-  strncpy(new->message.data, m->data, 20);
+  strncpy(new->message.data, message.data, 20);
   printf(new->message.data);
+
   //Adding new buffer in the existing buffer
-  if(tail==0){
+  if(tail==NULL){
     tail = new;
     head = new;
   }
@@ -69,11 +49,29 @@ void add_to_buffer(struct msg *m){
     tail->next = new;
     tail = new;
   }
-  new->next=0;
+
+  //Retreive the first message in the buffer
+  struct buffer *curr_buffer = head;
+  head = head -> next;
+  if(head==NULL){
+    tail == NULL;
+  }
+
+  if(!sender_state) return;
+
+  strncpy(curr_packet.payload, head->message.data, 20);
+  printf(curr_packet.payload);
+  curr_packet.acknum = 1;
+  curr_packet.seqnum = seq_num_A;
+  curr_packet.checksum = get_checksum(&curr_packet);
+  tolayer3(0, curr_packet);
+  sender_state = false;
+  starttimer(0, 10.0);
 }
+
 int get_checksum(struct pkt *pkt){
     int result = 0;
-    if(pkt == 0){
+    if(pkt == NULL){
         return result;
     }
     result = result + pkt->acknum;
@@ -141,7 +139,6 @@ void B_input(packet)
   /* send back ack */
   packet.acknum = packet.seqnum;
   packet.checksum = get_checksum(&packet);
-
   tolayer3(1, packet);
 }
 
