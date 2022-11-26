@@ -55,6 +55,7 @@ void A_output(message) struct msg message;
     {
       new->message.data[i] = message.data[i];
     }
+    new->message.data[20]='\0';
     // strncpy(new->message.data, message.data, sizeof(message.data)/sizeof(message.data[0]));
     //  Adding new buffer in the existing buffer
     if (tail == NULL)
