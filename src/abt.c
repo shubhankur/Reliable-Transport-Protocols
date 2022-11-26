@@ -47,8 +47,12 @@ void A_output(message) struct msg message;
   else
   {
     new->next = NULL;
-    strncpy(new->message.data, message.data, 20);
-    //Adding new buffer in the existing buffer
+    for (int i = 0; i < 20; ++i)
+    {
+      new->message.data[i] = message.data[i];
+    }
+    //strncpy(new->message.data, message.data, 20);
+    // Adding new buffer in the existing buffer
     if (tail == NULL)
     {
       printf("Tail is null\n");
@@ -72,7 +76,8 @@ void A_output(message) struct msg message;
     printf("No msg to process\n");
     return;
   }
-  if (!sender_state){
+  if (!sender_state)
+  {
     printf("sender not ready\n");
     return;
   }
@@ -83,7 +88,7 @@ void A_output(message) struct msg message;
   tolayer3(0, curr_packet);
   sender_state = false;
 
-  //Setting head to next message
+  // Setting head to next message
   head = head->next;
   if (head == NULL)
   {
