@@ -34,10 +34,8 @@ void A_output(message)
 {
   if(!sender_state) return;
   sender_state = false;
-  for (int i=0; i<20; i++)
-  {
-    curr_packet.payload[i] = message.data[i];
-  }
+  strncpy(curr_packet.payload, message.data, 20);
+  printf(curr_packet.payload);
   curr_packet.acknum = 1;
   curr_packet.seqnum = seq_num_A;
   curr_packet.checksum = get_checksum(&curr_packet);
