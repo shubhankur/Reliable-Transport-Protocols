@@ -53,7 +53,7 @@ void A_output(message)
 { 
   int checksum = 0;
   struct node *n;
-  printf(message);
+  printf(message.data);
   printf("\n");
   append_msg(&message);//add msg to buffer
   if(sender_state != waiting_pkt)
