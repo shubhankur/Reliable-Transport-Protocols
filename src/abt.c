@@ -37,10 +37,11 @@ struct buffer *tail = NULL;
 void A_output(message) struct msg message;
 {
   // Creating new buffer using message
-  printf("%s \n",message.data);
+  printf("%s \n", message.data);
   struct buffer *new = (struct buffer *)malloc(sizeof(struct buffer));
-  for(int i = 0;i<sizeof(new->message.data)/sizeof(new->message.data[0]);i++){
-      new->message.data[i]='\0';
+  for (int i = 0; i < sizeof(new->message.data) / sizeof(new->message.data[0]); i++)
+  {
+    new->message.data[i] = '\0';
   }
   printf(new->message.data);
   if (new == NULL)
@@ -50,8 +51,12 @@ void A_output(message) struct msg message;
   else
   {
     new->next = NULL;
-    strncpy(new->message.data, message.data, sizeof(message.data)/sizeof(message.data[0]));
-    // Adding new buffer in the existing buffer
+    for (int i = 0; i < sizeof(new->message.data) / sizeof(new->message.data[0]); i++)
+    {
+      new->message.data[i] = message.data[i];
+    }
+    // strncpy(new->message.data, message.data, sizeof(message.data)/sizeof(message.data[0]));
+    //  Adding new buffer in the existing buffer
     if (tail == NULL)
     {
       printf("Tail is null\n");
