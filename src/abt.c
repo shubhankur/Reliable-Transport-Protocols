@@ -68,7 +68,7 @@ void A_input(packet)
   }
   seq_num_A=1-seq_num_A;
   sender_state = true;
-  stoptimer(0);
+  //stoptimer(0);
 }
 
 /* called when A's timer goes off */
