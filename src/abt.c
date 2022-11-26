@@ -2,6 +2,7 @@
 #include "stdbool.h"
 #include "string.h"
 #include "stdio.h"
+#include "stdlib.h"
 
 /* ******************************************************************
  ALTERNATING BIT AND GO-BACK-N NETWORK EMULATOR: VERSION 1.1  J.F.Kurose
