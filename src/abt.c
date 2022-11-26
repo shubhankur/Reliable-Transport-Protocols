@@ -139,8 +139,12 @@ void A_timerinterrupt()
 {
   if (sender_state == true)
   {
+    printf("Timer interrupt \n");
     tolayer3(0, curr_packet);
-    starttimer(0, 10.0);
+    starttimer(0, 20.0);
+  }
+  else{
+    printf("Timer sender state false \n");
   }
 }
 
