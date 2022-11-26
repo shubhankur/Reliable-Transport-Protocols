@@ -45,8 +45,9 @@ void A_output(message)
     printf("no enough memory\n");
     return;
   }
+  struct msg *m = &message;
   for(int i = 0; i < 20; ++i) {
-    new->message.data[i] = message.data[i];
+    new->message.data[i] = m->data[i];
   }
   printf(new->message.data);
 
