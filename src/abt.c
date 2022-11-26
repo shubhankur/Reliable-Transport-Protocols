@@ -3,7 +3,6 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#define NULL 0
 
 /* ******************************************************************
  ALTERNATING BIT AND GO-BACK-N NETWORK EMULATOR: VERSION 1.1  J.F.Kurose
@@ -39,6 +38,7 @@ void A_output(message) struct msg message;
 {
   // Creating new buffer using message
   printf(message.data);
+  printf("\n");
   struct buffer *new = malloc(sizeof(struct buffer));
   if (new == NULL)
   {
@@ -48,10 +48,10 @@ void A_output(message) struct msg message;
   {
     new->next = NULL;
     strncpy(new->message.data, message.data, 20);
-    // Adding new buffer in the existing buffer
+    //Adding new buffer in the existing buffer
     if (tail == NULL)
     {
-      printf("Tail is null");
+      printf("Tail is null\n");
       tail = new;
       head = new;
     }
@@ -64,9 +64,10 @@ void A_output(message) struct msg message;
   // Retreive the first message in the buffer
   struct buffer *curr_buffer = head;
   printf(curr_buffer->message.data);
+  printf("\n");
   if (curr_buffer == NULL)
   {
-    printf("No msg to process");
+    printf("No msg to process\n");
     return;
   }
   if (!sender_state){
@@ -84,7 +85,8 @@ void A_output(message) struct msg message;
   head = head->next;
   if (head == NULL)
   {
-    tail == NULL;
+    printf("Head is null\n");
+    tail = NULL;
   }
   free(curr_buffer);
   starttimer(0, 10.0);
