@@ -61,6 +61,8 @@ void A_output(message) struct msg message;
       tail = new;
     }
   }
+  printf(new->message.data);
+  printf("\n");
   // Retreive the first message in the buffer
   struct buffer *curr_buffer = head;
   printf(curr_buffer->message.data);
