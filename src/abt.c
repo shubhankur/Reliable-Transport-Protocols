@@ -45,11 +45,8 @@ void A_output(message) struct msg message;
   }
   else
   {
-    printf("created buffer\n");
     new->next = NULL;
     strncpy(new->message.data, message.data, 20);
-    printf(new->message.data);
-    printf("\n");
     // Adding new buffer in the existing buffer
     if (tail == NULL)
     {
@@ -64,7 +61,6 @@ void A_output(message) struct msg message;
     }
   }
   // Retreive the first message in the buffer
-  printf(head->message.data);
   struct buffer *curr_buffer = head;
   if (curr_buffer == NULL)
   {
@@ -79,12 +75,7 @@ void A_output(message) struct msg message;
 
   if (!sender_state)
     return;
-
-  printf("creating packet \n");
-  printf(curr_buffer->message.data," hehehe");
-  printf("\n");
   strncpy(curr_packet.payload, curr_buffer->message.data, 20);
-  printf(curr_packet.payload);
   curr_packet.acknum = 1;
   curr_packet.seqnum = seq_num_A;
   curr_packet.checksum = get_checksum(&curr_packet);
