@@ -53,7 +53,8 @@ void A_output(message)
 { 
   int checksum = 0;
   struct node *n;
-  printf("%s \n", message);
+  printf(message);
+  printf("\n");
   append_msg(&message);//add msg to buffer
   if(sender_state != waiting_pkt)
   {
@@ -76,13 +77,13 @@ void A_output(message)
     cur_packet.payload[i] = n->message.data[i];
   }
   free(n);
-  printf("%s \n", cur_packet.payload);
+  printf(cur_packet.payload);
+  printf("\n");
   cur_packet.seqnum = A_seqnum;
   cur_packet.acknum = DEFAULT_ACK;
   checksum = calc_checksum(&cur_packet);
   cur_packet.checksum = checksum;
   tolayer3(A, cur_packet);
-
   starttimer(A, TIMEOUT);
 }
 
@@ -141,7 +142,8 @@ void B_input(packet)
   else
   {
     B_seqnum = (B_seqnum + 1)%2;
-    printf("%s \n", packet.payload);
+    printf(packet.payload);
+    printf("\n");
     tolayer5(B, packet.payload);
     //Debug_Log(B, "Send packet to layer5", &packet, NULL);
   }
