@@ -37,7 +37,6 @@ struct buffer *tail = NULL;
 /* called from layer 5, passed the data to be sent to other side */
 void A_output(message) struct msg message;
 {
-  printf("starting\n");
   // Creating new buffer using message
   struct buffer *new = malloc(sizeof(struct buffer));
   if (new == NULL)
@@ -49,12 +48,12 @@ void A_output(message) struct msg message;
     printf("created buffer\n");
     new->next = NULL;
     strncpy(new->message.data, message.data, 20);
-    printf("msg copied\n");
     printf(new->message.data);
     printf("\n");
     // Adding new buffer in the existing buffer
     if (tail == NULL)
     {
+      printf("Tail is null");
       tail = new;
       head = new;
     }
@@ -64,8 +63,6 @@ void A_output(message) struct msg message;
       tail = new;
     }
   }
-  free(new);
-
   // Retreive the first message in the buffer
   printf(head->message.data);
   struct buffer *curr_buffer = head;
