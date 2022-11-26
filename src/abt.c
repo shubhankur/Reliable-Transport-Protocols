@@ -1,6 +1,7 @@
 #include "../include/simulator.h"
 #include "stdbool.h"
 #include "string.h"
+#include "stdio.h"
 
 /* ******************************************************************
  ALTERNATING BIT AND GO-BACK-N NETWORK EMULATOR: VERSION 1.1  J.F.Kurose
@@ -27,8 +28,8 @@ struct pkt curr_packet;
 int seq_num_A = 0;
 int seq_num_B = 0;
 int get_checksum(struct pkt *packet);
-struct buffer *head;
-struct buffer *tail;
+struct buffer *head = 0;
+struct buffer *tail = 0;
 
 /* called from layer 5, passed the data to be sent to other side */
 void A_output(message)
@@ -37,7 +38,7 @@ void A_output(message)
   //Creating new buffer using message
   struct buffer *new = malloc(sizeof(struct buffer)); 
   strncpy(new->message.data, message.data, 20);
-
+  printf(new->message.data);
   //Adding new buffer in the existing buffer
   if(tail==0){
     tail = new;
