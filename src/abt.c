@@ -1,4 +1,5 @@
 #include "../include/simulator.h"
+#include "stdbool.h"
 
 /* ******************************************************************
  ALTERNATING BIT AND GO-BACK-N NETWORK EMULATOR: VERSION 1.1  J.F.Kurose
@@ -14,25 +15,68 @@
 **********************************************************************/
 
 /********* STUDENTS WRITE THE NEXT SIX ROUTINES *********/
+//We create a buffer to store all the msgs
+struct buffer{
+  struct msg message;
+  struct buffer *next;
+};
+
+bool sender_state = true;
+struct pkt packet;
+int seq_num_A = 0;
+int seq_num_B = 0;
 
 /* called from layer 5, passed the data to be sent to other side */
 void A_output(message)
   struct msg message;
 {
+  if(!sender_state) return;
+  sender_state = false;
+  strncpy(message.data, packet.payload, 20);
+  packet.acknum = 1;
+  packet.seqnum = seq_num_A;
+  packet.checksum = get_checksum(&packet);
+  tolayer3(0, packet);
+  starttimer(0, 10.0);
+}
 
+int get_checksum(struct pkt *packet){
+    int result = 0;
+    if(packet == 0){
+        return result;
+    }
+    result = result + packet->acknum;
+    result = result + packet->seqnum;
+    char payload[20] = packet->payload;
+    int i = 0;
+    while(i<20){
+      result = result + (unsigned char)payload[i];
+    }
+    return result;
 }
 
 /* called from layer 3, when a packet arrives for layer 4 */
 void A_input(packet)
   struct pkt packet;
 {
-
+  if(packet.checksum!=get_checksum(&packet)){
+    return;
+  }
+  if(packet.acknum!=seq_num_A){
+    return;
+  }
+  seq_num_A=1-seq_num_A;
+  sender_state = true;
+  stoptimer(0);
 }
 
 /* called when A's timer goes off */
 void A_timerinterrupt()
 {
-
+  if(sender_state==true){
+    tolayer3(0, packet);
+    starttimer(0, 10.0);
+  }
 }  
 
 /* the following routine will be called once (only) before any other */
@@ -48,7 +92,27 @@ void A_init()
 void B_input(packet)
   struct pkt packet;
 {
+  if(packet.checksum != get_checksum(&packet))
+  {
+    return;
+  }
 
+  if(packet.seqnum != seq_num_B)
+  {
+    return;
+  }
+  /* normal package, deliver data to layer5 */
+  else
+  {
+    seq_num_B = 1- seq_num_B;
+    tolayer5(1, packet.payload);
+  }
+
+  /* send back ack */
+  packet.acknum = packet.seqnum;
+  packet.checksum = calc_checksum(&packet);
+
+  tolayer3(1, packet);
 }
 
 /* the following routine will be called once (only) before any other */
