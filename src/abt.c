@@ -42,6 +42,7 @@ void A_output(message) struct msg message;
   for(int i = 0;i<sizeof(new->message.data)/sizeof(new->message.data[0]);i++){
       new->message.data[i]='\0';
   }
+  printf(new->message.data);
   if (new == NULL)
   {
     printf("no enough memory\n");
