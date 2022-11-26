@@ -27,7 +27,10 @@ bool sender_state = true;
 struct pkt curr_packet;
 int seq_num_A = 0;
 int seq_num_B = 0;
+
 int get_checksum(struct pkt *packet);
+void add_to_buffer(struct msg *m);
+
 struct buffer *head = 0;
 struct buffer *tail = 0;
 
@@ -35,20 +38,7 @@ struct buffer *tail = 0;
 void A_output(message)
   struct msg message;
 {
-  //Creating new buffer using message
-  struct buffer *new = malloc(sizeof(struct buffer)); 
-  strncpy(new->message.data, message.data, 20);
-  printf(new->message.data);
-  //Adding new buffer in the existing buffer
-  if(tail==0){
-    tail = new;
-    head = new;
-  }
-  else{
-    tail->next = new;
-    tail = new;
-  }
-
+  add_to_buffer(&message);
   struct buffer *curr_buffer = head;
   head = head -> next;
   if(head==0){
@@ -65,6 +55,22 @@ void A_output(message)
   starttimer(0, 10.0);
 }
 
+void add_to_buffer(struct msg *m){
+  //Creating new buffer using message
+  struct buffer *new = malloc(sizeof(struct buffer)); 
+  strncpy(new->message.data, m->data, 20);
+  printf(new->message.data);
+  //Adding new buffer in the existing buffer
+  if(tail==0){
+    tail = new;
+    head = new;
+  }
+  else{
+    tail->next = new;
+    tail = new;
+  }
+  new->next=0;
+}
 int get_checksum(struct pkt *pkt){
     int result = 0;
     if(pkt == 0){
