@@ -171,6 +171,7 @@ void B_input(packet) struct pkt packet;
   {
     seq_num_B = 1 - seq_num_B;
     printf(packet.payload);
+    printf("\n");
     tolayer5(1, packet.payload);
   }
 
