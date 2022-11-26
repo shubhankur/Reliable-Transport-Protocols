@@ -69,11 +69,6 @@ void A_output(message) struct msg message;
     printf("No msg to process");
     return;
   }
-  head = head->next;
-  if (head == NULL)
-  {
-    tail == NULL;
-  }
   if (!sender_state){
     printf("sender not ready\n");
     return;
@@ -84,6 +79,15 @@ void A_output(message) struct msg message;
   curr_packet.checksum = get_checksum(&curr_packet);
   tolayer3(0, curr_packet);
   sender_state = false;
+
+  //Setting head to next message
+  head = head->next;
+  if (head == NULL)
+  {
+    tail == NULL;
+  }
+  free(curr_buffer);
+  free(new);
   starttimer(0, 10.0);
 }
 
