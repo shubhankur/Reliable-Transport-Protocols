@@ -27,14 +27,35 @@ struct pkt curr_packet;
 int seq_num_A = 0;
 int seq_num_B = 0;
 int get_checksum(struct pkt *packet);
+struct buffer *head;
+struct buffer *tail;
 
 /* called from layer 5, passed the data to be sent to other side */
 void A_output(message)
   struct msg message;
 {
+  //Creating new buffer using message
+  struct buffer *new = malloc(sizeof(struct buffer)); 
+  strncpy(new->message.data, message.data, 20);
+
+  //Adding new buffer in the existing buffer
+  if(tail==0){
+    tail = new;
+    head = new;
+  }
+  else{
+    tail->next = new;
+    tail = new;
+  }
+
+  struct buffer *curr_buffer = head;
+  head = head -> next;
+  if(head==0){
+    tail == 0;
+  }
   if(!sender_state) return;
   sender_state = false;
-  strncpy(curr_packet.payload, message.data, 20);
+  strncpy(curr_packet.payload, head->message.data, 20);
   printf(curr_packet.payload);
   curr_packet.acknum = 1;
   curr_packet.seqnum = seq_num_A;
