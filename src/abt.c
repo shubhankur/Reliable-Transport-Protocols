@@ -45,6 +45,7 @@ void A_output(message)
     printf("no enough memory\n");
     return;
   }
+  printf("created buffer\n");
   struct msg *m = &message;
   for(int i = 0; i < 20; ++i) {
     new->message.data[i] = m->data[i];
@@ -61,6 +62,7 @@ void A_output(message)
     tail = new;
   }
   new->next = NULL;
+  free(new);
 
   //Retreive the first message in the buffer
   struct buffer *curr_buffer = head;
