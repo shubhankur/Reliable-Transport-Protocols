@@ -83,9 +83,9 @@ void A_output(message) struct msg message;
     return;
 
   printf("creating packet \n");
-  printf(head->message.data);
+  printf(curr_buffer->message.data);
   printf("\n");
-  strncpy(curr_packet.payload, head->message.data, 20);
+  strncpy(curr_packet.payload, curr_buffer->message.data, 20);
   printf(curr_packet.payload);
   curr_packet.acknum = 1;
   curr_packet.seqnum = seq_num_A;
