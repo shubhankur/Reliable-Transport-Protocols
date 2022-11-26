@@ -67,6 +67,7 @@ void A_output(message) struct msg message;
   free(new);
 
   // Retreive the first message in the buffer
+  printf(head->message.data);
   struct buffer *curr_buffer = head;
   if (curr_buffer == NULL)
   {
@@ -83,7 +84,7 @@ void A_output(message) struct msg message;
     return;
 
   printf("creating packet \n");
-  printf(curr_buffer->message.data);
+  printf(curr_buffer->message.data," hehehe");
   printf("\n");
   strncpy(curr_packet.payload, curr_buffer->message.data, 20);
   printf(curr_packet.payload);
