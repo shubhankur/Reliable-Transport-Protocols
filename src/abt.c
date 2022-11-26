@@ -87,7 +87,6 @@ void A_output(message) struct msg message;
     tail == NULL;
   }
   free(curr_buffer);
-  free(new);
   starttimer(0, 10.0);
 }
 
