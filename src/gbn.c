@@ -150,8 +150,10 @@ void A_input(packet) struct pkt packet;
   printf("A_input\n");
   curr_packets[window_start].seqnum = -1; // set seq no of that packet to -1
   stoptimer(0);
+  printf("Timer stopped \n");
   pkt_in_window--; // decrement number of packets in window
   struct buffer *n = head;
+  printf(n->message.data);
   head = head->next;
   if (head == NULL)
   {
