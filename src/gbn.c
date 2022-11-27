@@ -33,13 +33,13 @@ int get_checksum(struct pkt *packet);
 struct buffer *head = NULL;
 struct buffer *tail = NULL;
 
-int nextseq=0;//sequence count for A
-int pkt_in_window=0;// no of packets in A's window 
-int  WINDOW=0;
+int nextseq = 0;       // sequence count for A
+int pkt_in_window = 0; // no of packets in A's window
+int WINDOW = 0;
 
-int window_start = 0;//this is the packet for which we are waiting for ack
-int last=0;//last tranmitted packet from the window
-int waiting_ack=0;
+int window_start = 0; // this is the packet for which we are waiting for ack
+int last = 0;         // last tranmitted packet from the window
+int waiting_ack = 0;
 
 /* called from layer 5, passed the data to be sent to other side */
 void A_output(message) struct msg message;
@@ -58,8 +58,8 @@ void A_output(message) struct msg message;
   else
   {
     new->next = NULL;
-    strncpy(new->message.data, message.data, sizeof(message.data)/sizeof(message.data[0]));
-    new->message.data[20]='\0';
+    strncpy(new->message.data, message.data, sizeof(message.data) / sizeof(message.data[0]));
+    new->message.data[20] = '\0';
     //  Adding new buffer in the existing buffer
     if (tail == NULL)
     {
@@ -83,15 +83,15 @@ void A_output(message) struct msg message;
     printf("No msg to process\n");
     return;
   }
-  if(((last+1)%WINDOW)==window_start)
+  if (((last + 1) % WINDOW) == window_start)
   {
     return;
-  } 
+  }
   else
   {
-    if(pkt_in_window!=0)//increment last pointer by 1 if there is already packet on last
+    if (pkt_in_window != 0) // increment last pointer by 1 if there is already packet on last
     {
-       last=(last+1)%WINDOW;
+      last = (last + 1) % WINDOW;
     }
   }
   strncpy(curr_packets[last].payload, curr_buffer->message.data, 20);
@@ -101,7 +101,7 @@ void A_output(message) struct msg message;
   nextseq++;
   pkt_in_window++;
   tolayer3(0, curr_packets[last]);
-  if(window_start==last)
+  if (window_start == last)
   {
     starttimer(0, 50.0);
   }
@@ -147,28 +147,29 @@ void A_input(packet) struct pkt packet;
     printf("Incorrect ACK at A\n");
     return;
   }
-  curr_packets[window_start].seqnum=-1;//set seq no of that packet to -1
+  printf("A_input\n");
+  curr_packets[window_start].seqnum = -1; // set seq no of that packet to -1
   stoptimer(0);
-  pkt_in_window--;//decrement number of packets in window
-  
-  if(pkt_in_window==0)
+  pkt_in_window--; // decrement number of packets in window
+  struct buffer *n = (struct buffer *)malloc(sizeof(struct buffer));
+  n = head;
+  head = head->next;
+  if (head == NULL)
   {
-    struct buffer *n;
-    n=head;
-    head = head -> next;
-    if(head==NULL){
-      tail=NULL;
-    }
-    while(n!=NULL)
-    {  
+    tail = NULL;
+  }
+  if (pkt_in_window == 0)
+  {
+    while (n != NULL)
+    {
       strncpy(curr_packets[last].payload, n->message.data, 20);
-      //free the memory of n
+      // free the memory of n
       free(n);
       curr_packets[last].seqnum = nextseq;
       curr_packets[last].acknum = 1;
       curr_packets[last].checksum = get_checksum(&curr_packets[last]);
       nextseq++;
-      //update the number of packets in window
+      // update the number of packets in window
       pkt_in_window++;
       tolayer3(0, curr_packets[last]);
       starttimer(0, 50.0);
@@ -176,32 +177,26 @@ void A_input(packet) struct pkt packet;
   }
   else
   {
-    window_start=(window_start+1)%WINDOW;
-    struct buffer *n;
-    n=head;
-    head = head -> next;
-    if(head==NULL){
-      tail=NULL;
-    }
-    if(n!=NULL)
+    window_start = (window_start + 1) % WINDOW;
+    if (n != NULL)
     {
-      last=(last+1)%WINDOW;  
+      last = (last + 1) % WINDOW;
       curr_packets[last];
       strncpy(curr_packets[last].payload, n->message.data, 20);
-      //free the memory of n
+      // free the memory of n
       free(n);
 
       curr_packets[last].seqnum = nextseq;
       curr_packets[last].acknum = 1;
       curr_packets[last].checksum = get_checksum(&curr_packets[last]);
       nextseq++;
-      //update the number of packets in window
+      // update the number of packets in window
       pkt_in_window++;
       tolayer3(0, curr_packets[last]);
     }
   }
 
-  if(window_start != last || pkt_in_window==1)
+  if (window_start != last || pkt_in_window == 1)
   {
     starttimer(0, 50.0);
   }
@@ -210,19 +205,19 @@ void A_input(packet) struct pkt packet;
 /* called when A's timer goes off */
 void A_timerinterrupt()
 {
-  int i=window_start;
-  printf("expecting ack:%d\n",curr_packets[window_start].seqnum);
-  while(i!=last)
+  int i = window_start;
+  printf("expecting ack:%d\n", curr_packets[window_start].seqnum);
+  while (i != last)
   {
-    printf("sending seq no:%d\n",curr_packets[i].seqnum);
+    printf("sending seq no:%d\n", curr_packets[i].seqnum);
     tolayer3(0, curr_packets[i]);
-    i=(i+1)%WINDOW;
+    i = (i + 1) % WINDOW;
   }
-   printf("sending seq no:%d\n",curr_packets[i].seqnum);
-    tolayer3(0, curr_packets[i]);
- 
+  printf("sending seq no:%d\n", curr_packets[i].seqnum);
+  tolayer3(0, curr_packets[i]);
+
   /* If there is still some packets, start the timer again */
-  if(window_start != last || pkt_in_window==1)
+  if (window_start != last || pkt_in_window == 1)
   {
     starttimer(0, 50.0);
   }
@@ -232,7 +227,7 @@ void A_timerinterrupt()
 /* entity A routines are called. You can use it to do any initialization */
 void A_init()
 {
-  WINDOW=getwinsize();//initialize the window varibale
+  WINDOW = getwinsize(); // initialize the window varibale
   curr_packets = malloc(sizeof(struct pkt) * WINDOW);
 }
 
@@ -241,13 +236,13 @@ void A_init()
 /* called from layer 3, when a packet arrives for layer 4 at B*/
 void B_input(packet) struct pkt packet;
 {
-  if(packet.checksum != get_checksum(&packet))
+  if (packet.checksum != get_checksum(&packet))
   {
     printf("Packet is corrupted");
     return;
   }
-  printf("Expected seq:%d\n",seq_num_B);
-  if(packet.seqnum == seq_num_B)
+  printf("Expected seq:%d\n", seq_num_B);
+  if (packet.seqnum == seq_num_B)
   {
     printf("Correct packet received sending it to layer 5");
     ++seq_num_B;
@@ -255,12 +250,12 @@ void B_input(packet) struct pkt packet;
   }
   else
   {
-    printf("pkt seq:%d\n",packet.seqnum);
-    printf("out of order packet");
-    if(packet.seqnum < seq_num_B)
+    printf("pkt seq:%d\n", packet.seqnum);
+    printf("out of order packet\n");
+    if (packet.seqnum < seq_num_B)
     {
-       printf("sent ack:%d\n",packet.seqnum);
-      packet.acknum = packet.seqnum ;
+      printf("sent ack:%d\n", packet.seqnum);
+      packet.acknum = packet.seqnum;
       packet.checksum = get_checksum(&packet);
       tolayer3(1, packet);
     }
