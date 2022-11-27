@@ -151,13 +151,14 @@ void A_input(packet) struct pkt packet;
   curr_packets[window_start].seqnum = -1; // set seq no of that packet to -1
   stoptimer(0);
   pkt_in_window--; // decrement number of packets in window
-  struct buffer *n = (struct buffer *)malloc(sizeof(struct buffer));
-  n = head;
+  struct buffer *n = head;
   head = head->next;
   if (head == NULL)
   {
+    printf("Head in NULL after pop");
     tail = NULL;
   }
+  printf(n->message.data);
   if (pkt_in_window == 0)
   {
     while (n != NULL)
