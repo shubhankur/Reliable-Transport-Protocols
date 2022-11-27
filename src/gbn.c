@@ -162,9 +162,10 @@ void A_input(packet) struct pkt packet;
   {
     while (n != NULL)
     {
-      strncpy(curr_packets[last].payload, n->message.data, 20);
-      // free the memory of n
-      free(n);
+      printf("pkt in window = 0");
+      curr_packets[last];
+      strncpy(curr_packets[last].payload, n->message.data, sizeof(n->message.data) / sizeof(n->message.data[0]));
+      printf("msg copied");
       curr_packets[last].seqnum = nextseq;
       curr_packets[last].acknum = 1;
       curr_packets[last].checksum = get_checksum(&curr_packets[last]);
@@ -177,15 +178,14 @@ void A_input(packet) struct pkt packet;
   }
   else
   {
+    printf("pkt in window != 0");
     window_start = (window_start + 1) % WINDOW;
     if (n != NULL)
     {
       last = (last + 1) % WINDOW;
       curr_packets[last];
-      strncpy(curr_packets[last].payload, n->message.data, 20);
-      // free the memory of n
-      free(n);
-
+      strncpy(curr_packets[last].payload, n->message.data, sizeof(n->message.data) / sizeof(n->message.data[0]));
+      printf("msg copied");
       curr_packets[last].seqnum = nextseq;
       curr_packets[last].acknum = 1;
       curr_packets[last].checksum = get_checksum(&curr_packets[last]);
@@ -195,7 +195,7 @@ void A_input(packet) struct pkt packet;
       tolayer3(0, curr_packets[last]);
     }
   }
-
+  free(n);
   if (window_start != last || pkt_in_window == 1)
   {
     starttimer(0, 50.0);
@@ -205,6 +205,7 @@ void A_input(packet) struct pkt packet;
 /* called when A's timer goes off */
 void A_timerinterrupt()
 {
+  printf("inside time\n");
   int i = window_start;
   printf("expecting ack:%d\n", curr_packets[window_start].seqnum);
   while (i != last)
