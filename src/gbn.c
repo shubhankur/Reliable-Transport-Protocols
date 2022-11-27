@@ -153,14 +153,15 @@ void A_input(packet) struct pkt packet;
   printf("Timer stopped \n");
   pkt_in_window--; // decrement number of packets in window
   struct buffer *n = head;
-  printf(n->message.data);
+  printf("popped \n");
+  printf("%s msg \n",n->message.data);
   head = head->next;
   if (head == NULL)
   {
     printf("Head in NULL after pop");
     tail = NULL;
   }
-  printf(n->message.data);
+  printf("&s msg2 \n",n->message.data);
   if (pkt_in_window == 0)
   {
     while (n != NULL)
