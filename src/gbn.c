@@ -37,7 +37,6 @@ int nextseq=0;//sequence count for A
 int pkt_in_window=0;// no of packets in A's window 
 int  WINDOW=0;
 
-
 int window_start = 0;//this is the packet for which we are waiting for ack
 int last=0;//last tranmitted packet from the window
 int waiting_ack=0;
