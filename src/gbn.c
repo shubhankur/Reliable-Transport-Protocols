@@ -166,7 +166,7 @@ void A_input(packet) struct pkt packet;
       free(n);
       curr_packets[last].seqnum = nextseq;
       curr_packets[last].acknum = 1;
-      curr_packets[last].checksum = calc_checksum(&curr_packets[last]);
+      curr_packets[last].checksum = get_checksum(&curr_packets[last]);
       nextseq++;
       //update the number of packets in window
       pkt_in_window++;
@@ -193,7 +193,7 @@ void A_input(packet) struct pkt packet;
 
       curr_packets[last].seqnum = nextseq;
       curr_packets[last].acknum = 1;
-      curr_packets[last].checksum = calc_checksum(&curr_packets[last]);
+      curr_packets[last].checksum = get_checksum(&curr_packets[last]);
       nextseq++;
       //update the number of packets in window
       pkt_in_window++;
@@ -261,7 +261,7 @@ void B_input(packet) struct pkt packet;
     {
        printf("sent ack:%d\n",packet.seqnum);
       packet.acknum = packet.seqnum ;
-      packet.checksum = calc_checksum(&packet);
+      packet.checksum = get_checksum(&packet);
       tolayer3(1, packet);
     }
   }
