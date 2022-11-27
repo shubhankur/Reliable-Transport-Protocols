@@ -154,14 +154,7 @@ void A_input(packet) struct pkt packet;
   pkt_in_window--; // decrement number of packets in window
   struct buffer *n = head;
   printf("popped \n");
-  printf("%s msg \n",n->message.data);
-  head = head->next;
-  if (head == NULL)
-  {
-    printf("Head in NULL after pop");
-    tail = NULL;
-  }
-  printf("&s msg2 \n",n->message.data);
+  printf("%s msg \n", n->message.data);
   if (pkt_in_window == 0)
   {
     while (n != NULL)
@@ -197,6 +190,15 @@ void A_input(packet) struct pkt packet;
       // update the number of packets in window
       pkt_in_window++;
       tolayer3(0, curr_packets[last]);
+    }
+  }
+  if (head != NULL)
+  {
+    head = head->next;
+    if (head == NULL)
+    {
+      printf("Head is NULL after pop");
+      tail = NULL;
     }
   }
   free(n);
