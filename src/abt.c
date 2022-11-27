@@ -50,8 +50,8 @@ void A_output(message) struct msg message;
   else
   {
     new->next = NULL;
-    strncpy(new->message.data, message.data, sizeof(message.data)/sizeof(message.data[0]));
-    new->message.data[20]='\0';
+    strncpy(new->message.data, message.data, sizeof(message.data) / sizeof(message.data[0]));
+    new->message.data[20] = '\0';
     //  Adding new buffer in the existing buffer
     if (tail == NULL)
     {
@@ -143,7 +143,8 @@ void A_timerinterrupt()
     tolayer3(0, curr_packet);
     starttimer(0, 20.0);
   }
-  else{
+  else
+  {
     printf("Timer sender state true \n");
   }
 }
@@ -170,7 +171,6 @@ void B_input(packet) struct pkt packet;
     printf("Incorrect seq number at B\n");
     return;
   }
-  /* normal package, deliver data to layer5 */
   else
   {
     seq_num_B = 1 - seq_num_B;
