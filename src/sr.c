@@ -70,6 +70,7 @@ void A_output(message) struct msg message;
 
     if (pkt_in_window == WINDOW) // check if window is full
     {
+      printf("window is full");
         return;
     }
     n = pop_msg();
