@@ -106,7 +106,7 @@ void A_output(message) struct msg message;
     A_packets[last].ack = 0; // set ack to not received
     pkt_in_window++;         // increase the number of packets in the window
     printf("sending seq no:%d\n", A_packets[last].pi.seqnum);
-    printf("%s \n", A_packets[last].pi);
+    printf("%s \n", A_packets[last].pi.payload);
     tolayer3(A, A_packets[last].pi);
     if (is_timer_off == 0)
     {
