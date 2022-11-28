@@ -109,6 +109,7 @@ void A_output(message) struct msg message;
   }
   if (((last + 1) % WINDOW) == window_init)
   {
+    printf("//////last is higher");
     return;
   }
   else
@@ -241,7 +242,7 @@ void A_input(packet) struct pkt packet;
         printf("packets in window:%d\n", available_packets);
         A_seqnum++;
         A_packets[last].ack = 0; // set ack to not received
-        A_packets[last].timeover = current_time + 50.0;
+        A_packets[last].timeover = current_time + 30.0;
         available_packets++; // increase the number of packets in the window
         tolayer3(0, A_packets[last].pi);
       }
