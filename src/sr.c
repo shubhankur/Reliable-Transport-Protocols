@@ -3,7 +3,6 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#define NULL 0
 #define A 0
 #define B 1
 /* timeout for the timer */
@@ -13,8 +12,10 @@
 
 /*All function declarations*/
 int calc_checksum(struct pkt *p);
+void append_msg(struct msg *m);
+struct node *pop_msg();
 /*end*/
-/*node*/
+/*buffer*/
 struct node
 {
     struct msg message;
@@ -67,39 +68,14 @@ int is_timer_off = 0;
 void A_output(message) struct msg message;
 {
     printf("\n================================ Inside A_output================================\n");
+    struct node *n;
+    append_msg(&message);
     printf("%s \n", message.data);
     if (pkt_in_window == WINDOW) // check if window is full
     {
         return;
     }
-    struct node *new = (struct node *)malloc(sizeof(struct node));
-    for (int i = 0; i < sizeof(new->message.data) / sizeof(new->message.data[0]); i++)
-    {
-        new->message.data[i] = '\0';
-    }
-    if (new == NULL)
-    {
-        printf("no enough memory\n");
-    }
-    else
-    {
-        new->next = NULL;
-        strncpy(new->message.data, message.data, sizeof(message.data) / sizeof(message.data[0]));
-        new->message.data[20] = '\0';
-        //  Adding new node in the existing node
-        if (list_end == NULL)
-        {
-            printf("Tail is null\n");
-            list_end = new;
-            list_head = new;
-        }
-        else
-        {
-            list_end->next = new;
-            list_end = new;
-        }
-    }
-    struct node *n = list_head;
+    n = pop_msg();
     if (n == NULL)
     {
         printf("No message need to process\n");
@@ -116,13 +92,12 @@ void A_output(message) struct msg message;
             last = (last + 1) % WINDOW;
         }
     }
-    printf("%s \n", n->message.data);
     A_packets[last]; // the selected packet of the window
     for (int i = 0; i < 20; i++)
     {
         A_packets[last].pi.payload[i] = n->message.data[i];
     }
-    printf("%s \n", A_packets[last].pi.payload);
+    free(n);
     A_packets[last].pi.seqnum = A_seqnum;
     A_packets[last].pi.acknum = DEFAULT_ACK;
     A_packets[last].pi.checksum = calc_checksum(&A_packets[last].pi);
@@ -131,6 +106,7 @@ void A_output(message) struct msg message;
     A_packets[last].ack = 0; // set ack to not received
     pkt_in_window++;         // increase the number of packets in the window
     printf("sending seq no:%d\n", A_packets[last].pi.seqnum);
+    printf("%s \n", A_packets[last].pi);
     tolayer3(A, A_packets[last].pi);
     if (is_timer_off == 0)
     {
@@ -139,13 +115,6 @@ void A_output(message) struct msg message;
         starttimer(A, INTERVAL);
     }
     return 0;
-    list_head = list_head->next;
-    if (list_head == NULL)
-    {
-        printf("Head is null\n");
-        list_end = NULL;
-    }
-    free(n);
 }
 
 /* called from layer 3, when a packet arrives for layer 4 */
@@ -169,7 +138,8 @@ void A_input(packet) struct pkt packet;
             window_start = (window_start + 1) % WINDOW;
             last = (last + 1) % WINDOW;
             printf("Window is empty nw\n");
-            struct node *n = list_head;
+            struct node *n;
+            n = pop_msg();
             if (n != NULL)
             {
                 A_packets[last];
@@ -224,8 +194,9 @@ void A_input(packet) struct pkt packet;
             printf("new WS:%d\n", window_start);
             printf("last:%d\n", last);
             printf("pkt in window:%d\n", pkt_in_window);
-            // send packet from node
-            struct node *n = list_head;
+            // send packet from buffer
+            struct node *n;
+            n = pop_msg();
             if (n != NULL)
             {
                 A_packets[last];
@@ -270,15 +241,6 @@ void A_input(packet) struct pkt packet;
                 break;
             }
             i = (i + 1) % WINDOW;
-        }
-    }
-    if (list_head != NULL)
-    {
-        list_head = list_head->next;
-        if (list_head == NULL)
-        {
-            printf("Head is NULL after pop");
-            list_end = NULL;
         }
     }
 }
@@ -428,4 +390,50 @@ int calc_checksum(struct pkt *p)
     checksum += p->seqnum;
     checksum += p->acknum;
     return checksum;
+}
+void append_msg(struct msg *m)
+{
+    int i;
+    /*allocate memory*/
+    struct node *n = malloc(sizeof(struct node));
+    if (n == NULL)
+    {
+        printf("no enough memory\n");
+        return;
+    }
+    n->next = NULL;
+    /*copy packet*/
+    for (i = 0; i < 20; ++i)
+    {
+        n->message.data[i] = m->data[i];
+    }
+
+    /* if list empty, just add into the list*/
+    if (list_end == NULL)
+    {
+        list_head = n;
+        list_end = n;
+        return;
+    }
+    /* otherwise, add at the end*/
+    list_end->next = n;
+    list_end = n;
+}
+struct node *pop_msg()
+{
+    struct node *p;
+    /* if the list is empty, return NULL*/
+    if (list_head == NULL)
+    {
+        return NULL;
+    }
+
+    /* retrive the first node*/
+    p = list_head;
+    list_head = p->next;
+    if (list_head == NULL)
+    {
+        list_end = NULL;
+    }
+    return p;
 }
