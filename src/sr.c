@@ -378,7 +378,7 @@ void B_input(packet) struct pkt packet;
             B_packets[m].pi = packet;
             printf("stored seqnum:%d", B_packets[m].pi.seqnum);
             packet.acknum = packet.seqnum;
-            packet.checksum = calc_checksum(&packet);
+            packet.checksum = get_checksum(&packet);
             tolayer3(1, packet);
             break;
           }
