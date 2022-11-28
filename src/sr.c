@@ -67,6 +67,7 @@ int is_timer_off = 0;
 void A_output(message) struct msg message;
 {
     printf("\n================================ Inside A_output================================\n");
+    printf("%s \n", message.data);
     if (pkt_in_window == WINDOW) // check if window is full
     {
         return;
@@ -115,11 +116,13 @@ void A_output(message) struct msg message;
             last = (last + 1) % WINDOW;
         }
     }
+    printf("%s \n", n->message.data);
     A_packets[last]; // the selected packet of the window
     for (int i = 0; i < 20; i++)
     {
         A_packets[last].pi.payload[i] = n->message.data[i];
     }
+    printf("%s \n", A_packets[last].pi.payload);
     A_packets[last].pi.seqnum = A_seqnum;
     A_packets[last].pi.acknum = DEFAULT_ACK;
     A_packets[last].pi.checksum = calc_checksum(&A_packets[last].pi);
@@ -345,6 +348,7 @@ void B_input(packet) struct pkt packet;
 
         printf("Correct packet received sending it to layer 5");
         B_seqnum = B_seqnum + 1;
+        printf("%s \n", packet.payload);
         tolayer5(B, packet.payload);
         packet.acknum = B_seqnum - 1; /* resend the latest ACK */
         packet.checksum = calc_checksum(&packet);
