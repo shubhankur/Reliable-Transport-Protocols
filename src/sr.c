@@ -194,6 +194,7 @@ void A_input(packet) struct pkt packet;
         A_packets[last].timeover = current_time + 30.0;
         available_packets++; // increase the number of packets in the window
         tolayer3(0, A_packets[last].pi);
+        free(n);
       }
       else
       {
@@ -201,7 +202,6 @@ void A_input(packet) struct pkt packet;
         is_timer_off = 0;
         stoptimer(0);
       }
-      free(n);
     }
     else
     {
@@ -232,7 +232,6 @@ void A_input(packet) struct pkt packet;
       struct buffer *n = head;
       if (n != NULL)
       {
-        A_packets[last];
         strncpy(A_packets[last].pi.payload, n->message.data, 20);
         A_packets[last].pi.seqnum = A_seqnum;
         A_packets[last].pi.acknum = 1;
