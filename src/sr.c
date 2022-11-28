@@ -64,10 +64,10 @@ int waitng_ack = 0;
 int is_timer_off = 0;
 void A_output(message) struct msg message;
 {
-    printf("\n================================ Inside A_output================================\n");
+    //printf("\n================================ Inside A_output================================\n");
     struct node *n;
     append_msg(&message);
-
+    printf("%s \n", message.data);
     if (pkt_in_window == WINDOW) // check if window is full
     {
       printf("window is full");
@@ -76,7 +76,7 @@ void A_output(message) struct msg message;
     n = pop_msg();
     if (n == NULL)
     {
-        printf("No message need to process\n");
+        //printf("No message need to process\n");
         return 0;
     }
     if (((last + 1) % WINDOW) == window_start)
@@ -96,6 +96,7 @@ void A_output(message) struct msg message;
         A_packets[last].pi.payload[i] = n->message.data[i];
     }
     free(n);
+    printf("%s \n", A_packets[last].pi.payload);
     A_packets[last].pi.seqnum = A_seqnum;
     A_packets[last].pi.acknum = DEFAULT_ACK;
     A_packets[last].pi.checksum = calc_checksum(&A_packets[last].pi);
@@ -103,12 +104,12 @@ void A_output(message) struct msg message;
     A_packets[last].timeover = current_time + TIMEOUT;
     A_packets[last].ack = 0; // set ack to not received
     pkt_in_window++;         // increase the number of packets in the window
-    printf("sending seq no:%d\n", A_packets[last].pi.seqnum);
+    //printf("sending seq no:%d\n", A_packets[last].pi.seqnum);
     tolayer3(A, A_packets[last].pi);
     if (is_timer_off == 0)
     {
         is_timer_off = 1;
-        printf("Timer on\n");
+        //printf("Timer on\n");
         starttimer(A, INTERVAL);
     }
     return 0;
@@ -118,23 +119,23 @@ void A_output(message) struct msg message;
 void A_input(packet) struct pkt packet;
 {
 
-    printf("\n================================ Inside A_input===================================\n");
+    //printf("\n================================ Inside A_input===================================\n");
     if (packet.checksum != calc_checksum(&packet))
     {
-        printf("wrong checksum\n");
+        //printf("wrong checksum\n");
         return;
     }
-    printf("waiting ack:%d\n", A_packets[window_start].pi.seqnum);
+    //printf("waiting ack:%d\n", A_packets[window_start].pi.seqnum);
     if (packet.acknum == A_packets[window_start].pi.seqnum) // packets[window_start].seqnum)
     {
-        printf("Received correct ack:%d of WS:%d\n", A_packets[window_start].pi.seqnum, window_start);
+        //printf("Received correct ack:%d of WS:%d\n", A_packets[window_start].pi.seqnum, window_start);
         A_packets[window_start].ack = 1;
         pkt_in_window--;
         if (pkt_in_window == 0)
         {
             window_start = (window_start + 1) % WINDOW;
             last = (last + 1) % WINDOW;
-            printf("Window is empty nw\n");
+            //printf("Window is empty nw\n");
             struct node *n;
             n = pop_msg();
             if (n != NULL)
@@ -149,8 +150,8 @@ void A_input(packet) struct pkt packet;
                 A_packets[last].pi.seqnum = A_seqnum;
                 A_packets[last].pi.acknum = DEFAULT_ACK;
                 A_packets[last].pi.checksum = calc_checksum(&A_packets[last].pi);
-                printf("sending packet:%d\n", A_seqnum);
-                printf("packets in window:%d\n", pkt_in_window);
+                //printf("sending packet:%d\n", A_seqnum);
+                //printf("packets in window:%d\n", pkt_in_window);
                 A_seqnum++;
                 A_packets[last].ack = 0; // set ack to not received
                 A_packets[last].timeover = current_time + TIMEOUT;
@@ -160,7 +161,7 @@ void A_input(packet) struct pkt packet;
             }
             else
             {
-                printf("Timer off");
+                //printf("Timer off");
                 is_timer_off = 0;
                 stoptimer(A);
             }
@@ -188,9 +189,9 @@ void A_input(packet) struct pkt packet;
             {
                 last = window_start;
             }
-            printf("new WS:%d\n", window_start);
-            printf("last:%d\n", last);
-            printf("pkt in window:%d\n", pkt_in_window);
+            //printf("new WS:%d\n", window_start);
+            //printf("last:%d\n", last);
+            //printf("pkt in window:%d\n", pkt_in_window);
             // send packet from buffer
             struct node *n;
             n = pop_msg();
@@ -206,8 +207,8 @@ void A_input(packet) struct pkt packet;
                 A_packets[last].pi.seqnum = A_seqnum;
                 A_packets[last].pi.acknum = DEFAULT_ACK;
                 A_packets[last].pi.checksum = calc_checksum(&A_packets[last].pi);
-                printf("sending packet:%d\n", A_seqnum);
-                printf("packets in window:%d\n", pkt_in_window);
+                //printf("sending packet:%d\n", A_seqnum);
+                //printf("packets in window:%d\n", pkt_in_window);
                 A_seqnum++;
                 A_packets[last].ack = 0; // set ack to not received
                 A_packets[last].timeover = current_time + TIMEOUT;
@@ -221,19 +222,19 @@ void A_input(packet) struct pkt packet;
     else if (packet.acknum <= A_packets[window_start].pi.seqnum)
     {
         // duplicate acks
-        printf("Received old ack:%d\n", packet.acknum);
+        //printf("Received old ack:%d\n", packet.acknum);
     }
     else if (packet.acknum > A_packets[window_start].pi.seqnum)
     {
         // further widow packet ack
-        printf("Received future ack:%d\n", packet.acknum);
+        //printf("Received future ack:%d\n", packet.acknum);
         int i = window_start;
         while (i != last)
         {
             temp = (i + 1) % WINDOW;
             if (packet.acknum == A_packets[temp].pi.seqnum)
             {
-                printf("acked:%d\n", A_packets[temp].pi.seqnum);
+                //printf("acked:%d\n", A_packets[temp].pi.seqnum);
                 A_packets[temp].ack = 1;
                 break;
             }
@@ -250,15 +251,15 @@ void A_timerinterrupt()
     if (pkt_in_window != 0)
     {
 
-        // printf("pkt in windw:%d\n",pkt_in_window);
+        // //printf("pkt in windw:%d\n",pkt_in_window);
         int i = window_start;
-        // printf("Window start:%d\n",pkt_in_window);
+        // //printf("Window start:%d\n",pkt_in_window);
         while (i != last)
         {
             if (A_packets[i].ack == 0 && A_packets[i].timeover < current_time)
             {
-                printf("\n================================ Inside A_timerinterrupt===================================\n");
-                printf("sending seq no:%d\n", A_packets[i].pi.seqnum);
+                //printf("\n================================ Inside A_timerinterrupt===================================\n");
+                //printf("sending seq no:%d\n", A_packets[i].pi.seqnum);
                 A_packets[i].timeover = current_time + TIMEOUT;
                 tolayer3(A, A_packets[i].pi);
             }
@@ -266,8 +267,8 @@ void A_timerinterrupt()
         }
         if (A_packets[i].ack == 0 && A_packets[i].timeover < current_time)
         {
-            printf("\n========= Inside A_timerinterrupt==========\n");
-            printf("sending seq no:%d\n", A_packets[i].pi.seqnum);
+            //printf("\n========= Inside A_timerinterrupt==========\n");
+            //printf("sending seq no:%d\n", A_packets[i].pi.seqnum);
             A_packets[i].timeover = current_time + TIMEOUT;
             tolayer3(A, A_packets[window_start].pi);
         }
@@ -294,18 +295,18 @@ void A_init()
 /* called from layer 3, when a packet arrives for layer 4 at B*/
 void B_input(packet) struct pkt packet;
 {
-    printf("\n================================ Inside B_input===================================\n");
-    printf("Expected seq no:%d\n", B_seqnum);
+    //printf("\n================================ Inside B_input===================================\n");
+    //printf("Expected seq no:%d\n", B_seqnum);
     if (packet.checksum != calc_checksum(&packet))
     {
-        printf("Packet is corrupted");
+        //printf("Packet is corrupted");
         return;
     }
 
     if (packet.seqnum == B_seqnum)
     {
 
-        printf("Correct packet received sending it to layer 5");
+        //printf("Correct packet received sending it to layer 5");
         B_seqnum = B_seqnum + 1;
         tolayer5(B, packet.payload);
         packet.acknum = B_seqnum - 1; /* resend the latest ACK */
@@ -328,17 +329,17 @@ void B_input(packet) struct pkt packet;
     {
         if (packet.seqnum > B_seqnum)
         {
-            printf("Ack future window packets\n");
+            //printf("Ack future window packets\n");
             if (packet.seqnum <= B_seqnum + WINDOW)
             {
                 for (int m = 0; m < WINDOW; m++)
                 {
-                    printf("timeover:%d and seqnum of pk:%d\n", B_packets[m].timeover, packet.seqnum);
+                    //printf("timeover:%d and seqnum of pk:%d\n", B_packets[m].timeover, packet.seqnum);
                     if (B_packets[m].timeover == packet.seqnum)
                     {
-                        printf("storing seqnum:%d", packet.seqnum);
+                        //printf("storing seqnum:%d", packet.seqnum);
                         B_packets[m].pi = packet;
-                        printf("stored seqnum:%d", B_packets[m].pi.seqnum);
+                        //printf("stored seqnum:%d", B_packets[m].pi.seqnum);
                         packet.acknum = packet.seqnum;
                         packet.checksum = calc_checksum(&packet);
                         tolayer3(B, packet);
@@ -349,7 +350,7 @@ void B_input(packet) struct pkt packet;
         }
         else
         {
-            printf("old packet sending old ack");
+            //printf("old packet sending old ack");
             packet.acknum = packet.seqnum;
             packet.checksum = calc_checksum(&packet);
             tolayer3(B, packet);
@@ -394,7 +395,7 @@ void append_msg(struct msg *m)
     struct node *n = malloc(sizeof(struct node));
     if (n == NULL)
     {
-        printf("no enough memory\n");
+        //printf("no enough memory\n");
         return;
     }
     n->next = NULL;
