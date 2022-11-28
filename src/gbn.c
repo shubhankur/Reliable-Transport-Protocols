@@ -114,7 +114,6 @@ void A_output(message) struct msg message;
     tail = NULL;
   }
   free(curr_buffer);
-  return 0;
 }
 
 int get_checksum(struct pkt *pkt)
