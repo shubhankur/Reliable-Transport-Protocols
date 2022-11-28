@@ -179,7 +179,7 @@ void A_input(packet) struct pkt packet;
     {
       window_init = (window_init + 1) % WINDOW;
       last = (last + 1) % WINDOW;
-      printf("Window is empty noww\n");
+      printf("Window is empty now\n");
       struct buffer *n = head;
       if (n != NULL)
       {
@@ -203,7 +203,7 @@ void A_input(packet) struct pkt packet;
     else
     {
       int i = window_init;
-      for (;i != last;i = (i + 1) % WINDOW)
+      for (;i != last;)
       {
         int temp = (i + 1) % WINDOW;
         if (A_packets[temp].ack != 1)
@@ -211,6 +211,8 @@ void A_input(packet) struct pkt packet;
           break;
         }
         available_packets--;
+        i = (i + 1) % WINDOW;
+
         if (i == last)
         {
           last = i;
@@ -302,7 +304,7 @@ void A_init()
     A_packets[i].ack == 0;
     i++;
   }
-  is_timer_off = false;
+  is_timer_off = true;
   starttimer(0, 1.0);
 }
 
