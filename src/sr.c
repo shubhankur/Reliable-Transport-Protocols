@@ -183,7 +183,6 @@ void A_input(packet) struct pkt packet;
       struct buffer *n = head;
       if (n != NULL)
       {
-        A_packets[last];
         strncpy(A_packets[last].pi.payload, n->message.data, 20);
         A_packets[last].pi.seqnum = A_seqnum;
         A_packets[last].pi.acknum = 1;
