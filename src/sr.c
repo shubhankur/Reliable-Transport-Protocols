@@ -29,6 +29,7 @@ bool sender_state = true;
 int seq_num_A = 0;
 int seq_num_B = 0;
 int get_checksum(struct pkt *packet);
+struct buffer *pop_msg();
 struct buffer *head = NULL;
 struct buffer *tail = NULL;
 
@@ -99,7 +100,7 @@ void A_output(message) struct msg message;
     return;
   }
   // Retreive the first message in the buffer
-  struct buffer *curr_buffer = head;
+  struct buffer *curr_buffer = pop_msg();
   printf(curr_buffer->message.data);
   printf("\n");
   if (curr_buffer == NULL)
@@ -136,12 +137,12 @@ void A_output(message) struct msg message;
   }
 
   // Setting head to next message
-  head = head->next;
-  if (head == NULL)
-  {
-    printf("Head is null\n");
-    tail = NULL;
-  }
+//   head = head->next;
+//   if (head == NULL)
+//   {
+//     printf("Head is null\n");
+//     tail = NULL;
+//   }
   free(curr_buffer);
 }
 
@@ -180,10 +181,11 @@ void A_input(packet) struct pkt packet;
       window_init = (window_init + 1) % WINDOW;
       last = (last + 1) % WINDOW;
       printf("Window is empty now\n");
-      struct buffer *n = head;
+      struct buffer *n = pop_msg();
       if (n != NULL)
       {
         strncpy(A_packets[last].p_items.payload, n->message.data, 20);
+        free(n);
         A_packets[last].p_items.seqnum = A_seqnum;
         A_packets[last].p_items.acknum = 1;
         A_packets[last].p_items.checksum = get_checksum(&A_packets[last].p_items);
@@ -192,7 +194,6 @@ void A_input(packet) struct pkt packet;
         A_packets[last].timeover = current_time + 30.0;
         available_packets++;
         tolayer3(0, A_packets[last].p_items);
-        free(n);
       }
       else
       {
@@ -224,10 +225,11 @@ void A_input(packet) struct pkt packet;
         last = window_init;
       }
       // send packet from buffer
-      struct buffer *n = head;
+      struct buffer *n = pop_msg();
       if (n != NULL)
       {
         strncpy(A_packets[last].p_items.payload, n->message.data, 20);
+        free(n);
         A_packets[last].p_items.seqnum = A_seqnum;
         A_packets[last].p_items.acknum = 1;
         A_packets[last].p_items.checksum = get_checksum(&A_packets[last].p_items);
@@ -237,7 +239,6 @@ void A_input(packet) struct pkt packet;
         available_packets++; // increase the number of packets in the window
         tolayer3(0, A_packets[last].p_items);
       }
-      free(n);
     }
   }
   else if (packet.acknum > A_packets[window_init].p_items.seqnum)
@@ -253,15 +254,15 @@ void A_input(packet) struct pkt packet;
       }
     }
   }
-  if (head != NULL)
-  {
-    head = head->next;
-    if (head == NULL)
-    {
-      printf("Head is NULL after pop");
-      tail = NULL;
-    }
-  }
+//   if (head != NULL)
+//   {
+//     head = head->next;
+//     if (head == NULL)
+//     {
+//       printf("Head is NULL after pop");
+//       tail = NULL;
+//     }
+//   }
 }
 
 /* called when A's timer goes off */
@@ -380,4 +381,22 @@ void B_init()
     B_packets[i].timeover = i; 
     i++;
   }
+}
+struct buffer *pop_msg()
+{
+    struct buffer *p;
+    /* if the list is empty, return NULL*/
+    if (head == NULL)
+    {
+        return NULL;
+    }
+
+    /* retrive the first node*/
+    p = head;
+    head = p->next;
+    if (head == NULL)
+    {
+        tail = NULL;
+    }
+    return p;
 }
