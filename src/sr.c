@@ -382,6 +382,7 @@ void B_init()
     i++;
   }
 }
+
 struct buffer *pop_msg()
 {
     struct buffer *p;
